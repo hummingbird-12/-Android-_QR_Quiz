@@ -25,22 +25,36 @@
         android:text="100"
         />
 
-    <View
-        android:id="@+id/cameraView"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/instTitle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/scoreVal"
+        android:layout_margin="15dp"
+        android:text="@string/inst0"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/instList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/instTitle"
         android:layout_above="@id/cameraButton"
-        android:layout_margin="20dp"
+        android:layout_margin="10dp"
+        android:text="@string/inst1"
+        android:textSize="20sp"
         />
 
     <Button
         android:id="@+id/cameraButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_margin="20dp"
         android:text="@string/scan"
+        android:textSize="20sp"
         android:onClick="QrScan"
         />
 

@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">QR Treasure</string>
+
     <string name="score"><u>Score</u></string>
-    <string name="scan">Start Scan</string>
+    <string name="scan">스캔 시작!</string>
+
+    <string name="inst0"><u>게임 방법!</u></string>
+    <string name="inst1">
+        <b>1.</b> 문제 혹은 미션을 통과하여 정답 맞추고 해당 QR 코드를 스캔!
+        <b>\n2.</b> 정답이면 점수가 올라가고 오답이면 점수가 내려가요!
+        <b>\n3.</b> 곳곳에 보너스 혹은 꽝이 숨겨져 있어요!
+        <b>\n4.</b> 시간이 지난 후 누가 점수가 제일 높을까요?</string>
 </resources>
