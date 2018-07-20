@@ -1,5 +1,6 @@
 package com.example.inho.qrtreasure;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -8,11 +9,15 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 
 import com.google.zxing.Result;
+
+import java.util.StringTokenizer;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 import static android.Manifest.permission.CAMERA;
@@ -20,6 +25,11 @@ import static android.Manifest.permission.CAMERA;
 public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private final static int CAMERA_PERMISSION = 1;
     private ZXingScannerView mScannerView;
+
+    private TextView scoreVal;
+    private int score;
+    private int[] questions;
+    private final int QUESTION_COUNT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +45,10 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             }
         }
 
-        mScannerView = new ZXingScannerView(this);
+        restoreData();
+
+        scoreVal = findViewById(R.id.scoreVal);
+        scoreVal.setText(Integer.toString(score));
     }
 
     private boolean checkPermission() {
@@ -87,11 +100,15 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     }
 
     public void QrScan(View view) {
+        if(mScannerView == null)
+            mScannerView = new ZXingScannerView(this);
         setContentView(mScannerView);
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
+
     }
 
+    /*
     @Override
     public void onResume() {
         super.onResume();
@@ -110,24 +127,105 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             }
         }
     }
+    */
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mScannerView.stopCamera();
+        setContentView(R.layout.activity_main);
     }
 
     @Override
     public void handleResult(Result rawResult) {
         final String result = rawResult.getText();
-        onPause();
+        //onPause();
         // Do something with the result here
         Log.e("handler", rawResult.getText());
         Log.e("handler", rawResult.getBarcodeFormat().toString());
 
+        checkValidCode(result);
 
         //if you would like to resume scanning, call mScannerView.resumeCameraPreview(this);
-        onResume();
-        mScannerView.resumeCameraPreview(this);
+        //onResume();
+        //mScannerView.resumeCameraPreview(MainActivity.this);
+
+        onPause();
+        setContentView(R.layout.activity_main);
+        scoreVal = findViewById(R.id.scoreVal);
+        scoreVal.setText(Integer.toString(score));
+    }
+
+    private void checkValidCode(String QRtext) {
+        StringTokenizer st = new StringTokenizer(QRtext, ",");
+        int qu = Integer.parseInt(st.nextToken());
+        int key = Integer.parseInt(st.nextToken());
+
+        if(questions[qu] == 0) {
+            questions[qu] = 1;
+            if (key == 1)
+                increaseScore(20);
+            else
+                decreaseScore(10);
+        }
+        else
+            Toast.makeText(getApplicationContext(), "이미 시도했던 문제에요!", Toast.LENGTH_LONG).show();
+    }
+
+    private void increaseScore(int value) {
+        score += value;
+        Toast.makeText(getApplicationContext(), "정답이에요!", Toast.LENGTH_LONG).show();
+        saveData();
+    }
+
+    private void decreaseScore(int value) {
+        score -= value;
+        Toast.makeText(getApplicationContext(), "땡! 다른 문제를 도전하세요!", Toast.LENGTH_LONG).show();
+        saveData();
+    }
+
+    private void saveData() {
+        SharedPreferences data;
+        SharedPreferences.Editor editor;
+        StringBuilder str = new StringBuilder();
+
+        for(int i = 0; i < questions.length; i++)
+            str.append(questions[i]).append(",");
+
+        data = getApplicationContext().getSharedPreferences("SCORE_DATA", MODE_PRIVATE);
+        editor = data.edit();
+        editor.putInt("SCORE_DATA", score);
+        editor.commit();
+
+        data = getApplicationContext().getSharedPreferences("QUESTION_DATA", MODE_PRIVATE);
+        editor = data.edit();
+        editor.putString("string", str.toString());
+        editor.commit();
+    }
+
+    private void restoreData() {
+        SharedPreferences data;
+
+        data = getApplicationContext().getSharedPreferences("SCORE_DATA", MODE_PRIVATE);
+        score = data.getInt("SCORE_DATA", 0);
+
+        questions = new int[QUESTION_COUNT];
+        data = getApplicationContext().getSharedPreferences("QUESTION_DATA", MODE_PRIVATE);
+        String savedString = data.getString("string", "");
+        if(savedString != "") {
+            StringTokenizer st = new StringTokenizer(savedString, ",");
+            for (int i = 0; i < QUESTION_COUNT; i++)
+                questions[i] = Integer.parseInt(st.nextToken());
+        }
+    }
+
+    public void clearData(View view) {
+        score = 0;
+        for(int i = 0; i < questions.length; i++)
+            questions[i] = 0;
+
+        Toast.makeText(getApplicationContext(), "Data Cleared!", Toast.LENGTH_LONG).show();
+        scoreVal.setText(Integer.toString(score));
+        saveData();
     }
 }

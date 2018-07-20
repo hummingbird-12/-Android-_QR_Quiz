@@ -13,6 +13,7 @@
         android:textStyle="bold"
         android:textSize="30sp"
         android:textAlignment="center"
+        android:onClick="clearData"
         />
 
     <TextView
@@ -22,7 +23,6 @@
         android:layout_below="@id/scoreTitle"
         android:textAlignment="center"
         android:textSize="100sp"
-        android:text="100"
         />
 
     <TextView
