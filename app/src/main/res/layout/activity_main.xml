@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/score"
+        android:textStyle="bold"
         android:textSize="30sp"
         android:textAlignment="center"
         />
@@ -40,6 +41,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="20dp"
         android:text="@string/scan"
+        android:onClick="QrScan"
         />
 
 

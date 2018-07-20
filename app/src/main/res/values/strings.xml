@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">QR Treasure</string>
-    <string name="score">Score</string>
+    <string name="score"><u>Score</u></string>
     <string name="scan">Start Scan</string>
 </resources>
