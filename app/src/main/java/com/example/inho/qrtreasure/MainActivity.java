@@ -29,7 +29,10 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
     private TextView scoreVal;
     private int score;
     private int[] questions;
-    private final int QUESTION_COUNT = 5;
+    private final int QUESTION_COUNT = 20;
+    private final int QUESTION_OLD = 1;
+    private final int QUESTION_NEW = 0;
+    private final int CORRECT_ANSWER = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         restoreData();
 
         scoreVal = findViewById(R.id.scoreVal);
-        scoreVal.setText(Integer.toString(score));
+        scoreVal.setText(String.format("%s 점", Integer.toString(score)));
     }
 
     private boolean checkPermission() {
@@ -146,14 +149,26 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
         checkValidCode(result);
 
+
+        /*
+        StringTokenizer st = new StringTokenizer(result, ",");
+        int qu = Integer.parseInt(st.nextToken());
+        int key = Integer.parseInt(st.nextToken());
+
+        Toast.makeText(getApplicationContext(), String.format("Question:%d, ID:%d", qu, key), Toast.LENGTH_SHORT).show();
+        mScannerView.resumeCameraPreview(MainActivity.this);
+
+        */
+
         //if you would like to resume scanning, call mScannerView.resumeCameraPreview(this);
         //onResume();
         //mScannerView.resumeCameraPreview(MainActivity.this);
 
         onPause();
+        mScannerView.stopCamera();
         setContentView(R.layout.activity_main);
         scoreVal = findViewById(R.id.scoreVal);
-        scoreVal.setText(Integer.toString(score));
+        scoreVal.setText(String.format("%s 점", Integer.toString(score)));
     }
 
     private void checkValidCode(String QRtext) {
@@ -161,9 +176,9 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
         int qu = Integer.parseInt(st.nextToken());
         int key = Integer.parseInt(st.nextToken());
 
-        if(questions[qu] == 0) {
-            questions[qu] = 1;
-            if (key == 1)
+        if(questions[qu] == QUESTION_NEW) {
+            questions[qu] = QUESTION_OLD;
+            if (key == CORRECT_ANSWER)
                 increaseScore(20);
             else
                 decreaseScore(10);
@@ -199,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
         data = getApplicationContext().getSharedPreferences("QUESTION_DATA", MODE_PRIVATE);
         editor = data.edit();
-        editor.putString("string", str.toString());
+        editor.putString("QUESTION_DATA", str.toString());
         editor.commit();
     }
 
@@ -211,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
 
         questions = new int[QUESTION_COUNT];
         data = getApplicationContext().getSharedPreferences("QUESTION_DATA", MODE_PRIVATE);
-        String savedString = data.getString("string", "");
+        String savedString = data.getString("QUESTION_DATA", "");
         if(savedString != "") {
             StringTokenizer st = new StringTokenizer(savedString, ",");
             for (int i = 0; i < QUESTION_COUNT; i++)
@@ -225,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements ZXingScannerView.
             questions[i] = 0;
 
         Toast.makeText(getApplicationContext(), "Data Cleared!", Toast.LENGTH_LONG).show();
-        scoreVal.setText(Integer.toString(score));
+        scoreVal.setText(String.format("%s 점", Integer.toString(score)));
         saveData();
     }
 }
